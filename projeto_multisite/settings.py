@@ -27,6 +27,15 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', # default backend
+    'guardian.backends.ObjectPermissionBackend', # guardian
+    "site_permissions.backends.SitePermissionBackend", # site_permissions
+]
+
+ANONYMOUS_USER_ID = -1 # required for guardian
+
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -34,10 +43,13 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'artigos'
-    # 'guardian',
+    'artigos',
+
+    'guardian',
+    'site_permissions',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -78,6 +90,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+SITE_ID = 1
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
