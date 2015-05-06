@@ -8,6 +8,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+# -*- coding: utf-8 -*-
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -39,6 +41,8 @@ ANONYMOUS_USER_ID = -1 # required for guardian
 # Application definition
 
 INSTALLED_APPS = (
+    'grappelli',
+    # 'tinymce',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -96,3 +100,12 @@ SITE_ID = 1
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, "_static")
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "project_static"),
+)
+
+# Nome de exibicao pelo grappelli
+GRAPPELLI_ADMIN_TITLE = u'Projeto Multisite'
