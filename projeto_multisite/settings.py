@@ -42,6 +42,7 @@ ANONYMOUS_USER_ID = -1 # required for guardian
 
 INSTALLED_APPS = (
     'grappelli',
+    'filebrowser',
     # 'tinymce',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +52,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'artigos',
+    'categorias',
+    'testes',
 
     'guardian',
     'site_permissions',
@@ -95,6 +98,9 @@ USE_L10N = True
 USE_TZ = True
 
 SITE_ID = 1
+
+FILEBROWSER_DIRECTORY = 'uploads/'
+# FILEBROWSER_DIRECTORY = getattr(settings, "FILEBROWSER_DIRECTORY", 'uploads/')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/

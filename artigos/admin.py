@@ -6,17 +6,17 @@ from site_permissions.backends import RestrictSiteMixin
 
 # Register your models here.
 
-class ArtigoAdminForm(forms.ModelForm):
+# class ArtigoAdminForm(forms.ModelForm):
     # texto = forms.CharField(widget=TinyMCE(attrs={'cols': 80, 'rows': 30}))
     
-    class Meta:
-        model = Artigo
-        exclude = []
+    # class Meta:
+    #     model = Artigo
+    #     exclude = []
 
 class ArtigoAdmin(RestrictSiteMixin, admin.ModelAdmin):
-    form = ArtigoAdminForm
+    # form = ArtigoAdminForm
     list_display = ('titulo', 'publicacao',)
-    list_filter = ['publicacao']
+    list_filter = ['publicacao', 'site']
     search_fields = ['titulo', 'texto']
 
     class Media:
