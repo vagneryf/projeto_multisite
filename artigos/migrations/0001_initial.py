@@ -9,6 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('sites', '0001_initial'),
+        ('categorias', '0001_initial'),
     ]
 
     operations = [
@@ -19,6 +20,7 @@ class Migration(migrations.Migration):
                 ('titulo', models.CharField(max_length=100, verbose_name='T\xedtulo')),
                 ('publicacao', models.DateTimeField(default=datetime.datetime.now, verbose_name='Data de Publica\xe7\xe3o', blank=True)),
                 ('texto', models.TextField(max_length=300)),
+                ('categoria', models.ForeignKey(blank=True, to='categorias.Categoria', null=True)),
                 ('site', models.ForeignKey(to='sites.Site')),
             ],
             options={

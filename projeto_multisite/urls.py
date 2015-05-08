@@ -10,5 +10,5 @@ urlpatterns = patterns('',
     (r'^grappelli/', include('grappelli.urls')), # grappelli URLS
     url(r'^admin/', include(admin.site.urls)),
     # (r'^admin/',  include(admin.site.urls)), # admin site
-    (r'^tinymce/', include('tinymce.urls')),
+    # (r'^tinymce/', include('tinymce.urls')),
 )

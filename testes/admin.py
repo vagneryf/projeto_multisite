@@ -42,18 +42,23 @@ class TesteAdminForm(forms.ModelForm):
         # self.fields['secao'].default = lambda: Secao.objects.get(id=1)
         self.fields['secao'].queryset = secao
 
-    def clean_publicado_por(self):
-        # print self.cleaned_datapublicado_por
-        return self.cleaned_data["publicado_por"]
+    # def clean_publicado_por(self):
+    #     # print self.cleaned_datapublicado_por
+    #     return self.cleaned_data["publicado_por"]
 
 
 
 class TesteAdmin(admin.ModelAdmin):
     form = TesteAdminForm
-    list_display = ('titulo', 'publicacao', 'secao',)
-    list_filter = ['publicacao', 'secao']
+    list_display = ('titulo', 'publicacao', 'secao', 'publicado_por',)
+    list_filter = ['publicacao', 'secao', 'publicado_por']
     search_fields = ['titulo']
-    # exclude = ['publicado_por']
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return []
+        else:
+            return ['publicado_por']
+    # readonly_fields = ['publicado_por']
     # para mostrar os filtros como o admin default do Django:
     change_list_template = "admin/change_list_filter_sidebar.html"
     change_list_filter_template = "admin/filter_listing.html"
@@ -71,6 +76,14 @@ class TesteAdmin(admin.ModelAdmin):
     #         return forms.ModelChoiceField(
     #             queryset=queryset, initial=self.current_userself.id)
     #     return super(TesteAdmin, self).formfield_for_dbfield(field, **kwargs)
+
+
+    def save_model(self, request, obj, form, change):
+        if request.user.is_superuser:
+            obj.save()
+        else:
+            obj.publicado_por = request.user
+            obj.save()
 
     class Media:
         js = [
