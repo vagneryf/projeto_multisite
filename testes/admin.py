@@ -9,64 +9,64 @@ import re
 # class SecaoAdmin(admin.ModelAdmin):
 #     pass
 
-# class FiltrarSecao(admin.SimpleListFilter):
-#     title = u'Filtro Seção'
-#     parameter_name = 'sec'
-
-#     def lookups(self, request, model_admin):
-#         return (
-#             ('1', ('Secao 1')),
-#             ('2', ('Secao 2')),
-#         )
-
-#     def queryset(self, request, queryset):
-#         if self.value() == '1':
-#             return queryset.filter(secao=1)
-#         if self.value() == '2':
-#             return queryset.filter(secao=2)
-
 class TesteAdminForm(forms.ModelForm):
     # secao = forms.CharField()
-    class Meta:
-        model = Teste
-        exclude =[]
 
-    def __init__(self, *args, **kwargs):
-        super(TesteAdminForm, self).__init__(*args, **kwargs)
-        secao = Secao.objects.filter(id=1)
-        print 'AQUI!!!!!'
-        # print self.instance.request.user
-        # if self.instance.request.user == 2:
-        #     secao = Secao.objects.filter(id=2)
-        # self.fields['secao'].widget.attrs['readonly'] = True
-        # self.fields['secao'].default = lambda: Secao.objects.get(id=1)
-        self.fields['secao'].queryset = secao
+    # def __init__(self, *args, **kwargs):
+    #     super(TesteAdminForm, self).__init__(*args, **kwargs)
+    #     secao = Secao.objects.filter(id=1)
+    #     print 'AQUI!!!!!'
+    #     # print self.instance.request.user
+    #     # if self.instance.request.user == 2:
+    #     #     secao = Secao.objects.filter(id=2)
+    #     # self.fields['secao'].widget.attrs['readonly'] = True
+    #     # self.fields['secao'].default = lambda: Secao.objects.get(id=1)
+    #     self.fields['secao'].queryset = secao
+
+    # readonly_fields = ('publicado_por',)
+
+    class Meta:
+        fields = ['titulo', 'publicacao', 'texto', 'publicado_por']
+        model = Teste
+        # exclude = ['secao']
 
     # def clean_publicado_por(self):
     #     # print self.cleaned_datapublicado_por
     #     return self.cleaned_data["publicado_por"]
 
-
+class TesteAdminSuperForm(forms.ModelForm):
+    class Meta:
+        fields = ['titulo', 'publicacao', 'texto', 'secao', 'publicado_por']
+        model= Teste
 
 class TesteAdmin(admin.ModelAdmin):
-    form = TesteAdminForm
+    # form = TesteAdminForm
+    def get_form(self, request, obj=None, **kwargs):
+        if request.user.is_superuser:
+            kwargs['form'] = TesteAdminSuperForm
+        else:
+            kwargs['form'] = TesteAdminForm
+        return super(TesteAdmin, self).get_form(request, obj, **kwargs)
+
     list_display = ('titulo', 'publicacao', 'secao', 'publicado_por',)
     list_filter = ['publicacao', 'secao', 'publicado_por']
     search_fields = ['titulo']
+    # para mostrar os filtros como o admin default do Django:
+    change_list_template = "admin/change_list_filter_sidebar.html"
+    change_list_filter_template = "admin/filter_listing.html"
+
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return []
         else:
             return ['publicado_por']
+    # exclude = ['secao']
     # readonly_fields = ['publicado_por']
-    # para mostrar os filtros como o admin default do Django:
-    change_list_template = "admin/change_list_filter_sidebar.html"
-    change_list_filter_template = "admin/filter_listing.html"
-
-    # def get_form(self, req, obj=None, **kwargs):
+    
+    # def get_form(self, request, obj=None, **kwargs):
     #     # save the currently logged in user for later
-    #     self.current_user = req.user
-    #     return super(TesteAdmin, self).get_form(req, obj, **kwargs)
+    #     self.current_user = request.user
+    #     return super(TesteAdmin, self).get_form(request, obj, **kwargs)
 
     # def formfield_for_dbfield(self, field, **kwargs):
     #     from django import forms
