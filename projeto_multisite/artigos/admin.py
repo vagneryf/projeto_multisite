@@ -14,7 +14,7 @@ class ArtigoAdminForm(forms.ModelForm):
         model = Artigo
         fields = ['titulo', 'subtitulo', 'data_publicacao', 'texto', 'categoria', 'autor']
 
-class ArtigoAdmin(admin.ModelForm):
+class ArtigoAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         if request.user.is_superuser:
             kwargs['form'] = ArtigoAdminSuperForm
@@ -22,8 +22,8 @@ class ArtigoAdmin(admin.ModelForm):
             kwargs['form'] = ArtigoAdminForm
         return super(ArtigoAdmin, self).get_form(request, obj, **kwargs)
 
-    list_display = ('titulo', 'data_publicacao', 'categoria', 'autor',)
-    list_filter = ['data_publicacao', 'categoria', 'autor', 'site']
+    list_display = ('titulo', 'data_publicacao', 'categoria', 'autor', 'site',)
+    list_filter = ['site', 'data_publicacao', 'categoria', 'autor']
     search_fields = ['titulo']
     change_list_template = "admin/change_list_filter_sidebar.html"
     change_list_filter_template = "admin/filter_listing.html"
@@ -38,8 +38,25 @@ class ArtigoAdmin(admin.ModelForm):
         if request.user.is_superuser:
             obj.save()
         else:
-            obj.autor = request.user
-            obj.save()
+            print 'AQUIIIIIII'
+            try:
+                print obj.site
+                if obj.site == request.user.profile.site:
+                    obj.autor = request.user
+                    obj.site = request.user.profile.site
+                    obj.save()
+                else:
+                    print 'NAO TEM PERMISSAO DE SALVAR EM OUTRO SITE'
+            except Exception, e:
+                # raise
+                obj.autor = request.user
+                obj.site = request.user.profile.site
+                obj.save()
+                print 'NAO TEM OBJ, CRIADO NOVO'
+            # else:
+            #     pass
+            # finally:
+            #     pass
 
     class Media:
         js = [
@@ -47,9 +64,11 @@ class ArtigoAdmin(admin.ModelForm):
             '/static/tinymce_setup.js',
         ]
 
-# class CategoriaAdmin(admin.ModelForm):
-#   pass
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'data_criacao', 'descricao',)
+    search_fields = ['nome']
+    readonly_fields = ['data_criacao']
 
 # Register your models here.
 admin.site.register(Artigo, ArtigoAdmin)
-admin.site.register(Categoria)
+admin.site.register(Categoria, CategoriaAdmin)

@@ -8,8 +8,11 @@ from django.contrib.auth.models import User
 
 class Categoria(models.Model):
 	nome = models.CharField(max_length=100)
-	descricao = models.CharField(max_length=200)
+	descricao = models.CharField(max_length=200, null=True, blank=True)
 	data_criacao = models.DateTimeField(u'Data de criação', default=datetime.now, blank=True)
+
+	def __unicode__(self):
+		return self.nome
 
 class Artigo(models.Model):
 	titulo = models.CharField(u'Título', max_length=100)
