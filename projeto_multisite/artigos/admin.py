@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django import forms
 from .models import Artigo, Categoria
+from django.core.exceptions import ValidationError
 # from profiles import Profile
 
 class ArtigoAdminSuperForm(forms.ModelForm):
@@ -10,6 +11,12 @@ class ArtigoAdminSuperForm(forms.ModelForm):
         exclude = []
 
 class ArtigoAdminForm(forms.ModelForm):
+    def clean(self):
+        # if not request.user.is_superuser:
+        #     if obj.site != request.user.site:
+        #         print 'PASSOU AQUI'
+        if self.form.categoria == None:
+            raise ValidationError(u'Você não tem permissão para salvar esse Artigo')
     class Meta:
         model = Artigo
         fields = ['titulo', 'subtitulo', 'data_publicacao', 'texto', 'categoria', 'autor']
@@ -34,6 +41,7 @@ class ArtigoAdmin(admin.ModelAdmin):
         else:
             return ['autor']
 
+
     def save_model(self, request, obj, form, change):
         if request.user.is_superuser:
             obj.save()
@@ -47,6 +55,7 @@ class ArtigoAdmin(admin.ModelAdmin):
                     obj.save()
                 else:
                     print 'NAO TEM PERMISSAO DE SALVAR EM OUTRO SITE'
+                    raise ValidationError('You have not met a constraint!')
             except Exception, e:
                 # raise
                 obj.autor = request.user
