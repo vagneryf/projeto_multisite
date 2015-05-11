@@ -11,12 +11,12 @@ class ArtigoAdminSuperForm(forms.ModelForm):
         exclude = []
 
 class ArtigoAdminForm(forms.ModelForm):
-    def clean(self):
-        # if not request.user.is_superuser:
-        #     if obj.site != request.user.site:
-        #         print 'PASSOU AQUI'
-        if self.form.categoria == None:
-            raise ValidationError(u'Você não tem permissão para salvar esse Artigo')
+    # def clean(self):
+    #     # if not request.user.is_superuser:
+    #     #     if obj.site != request.user.site:
+    #     #         print 'PASSOU AQUI'
+    #     if self.form.categoria == None:
+    #         raise ValidationError(u'Você não tem permissão para salvar esse Artigo')
     class Meta:
         model = Artigo
         fields = ['titulo', 'subtitulo', 'data_publicacao', 'texto', 'categoria', 'autor']
@@ -29,11 +29,16 @@ class ArtigoAdmin(admin.ModelAdmin):
             kwargs['form'] = ArtigoAdminForm
         return super(ArtigoAdmin, self).get_form(request, obj, **kwargs)
 
-    list_display = ('titulo', 'data_publicacao', 'categoria', 'autor', 'site',)
+    list_display = ('titulo', 'data_publicacao', 'categoria', 'get_autor_name', 'site',)
     list_filter = ['site', 'data_publicacao', 'categoria', 'autor']
     search_fields = ['titulo']
     change_list_template = "admin/change_list_filter_sidebar.html"
     change_list_filter_template = "admin/filter_listing.html"
+
+    def get_autor_name(self, obj):
+        return obj.autor.get_full_name()
+    get_autor_name.short_description = 'Nome do Autor'
+    get_autor_name.admin_order_field = 'autor__first_name'
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
@@ -41,31 +46,35 @@ class ArtigoAdmin(admin.ModelAdmin):
         else:
             return ['autor']
 
-
     def save_model(self, request, obj, form, change):
         if request.user.is_superuser:
             obj.save()
         else:
-            print 'AQUIIIIIII'
+            # obj.autor = request.user
+            # obj.site = request.user.profile.site
+            # obj.save()
+            # Testar Try
+            # print 'AQUIIIIIII'
             try:
-                print obj.site
+            #     print obj.site
                 if obj.site == request.user.profile.site:
                     obj.autor = request.user
                     obj.site = request.user.profile.site
                     obj.save()
-                else:
-                    print 'NAO TEM PERMISSAO DE SALVAR EM OUTRO SITE'
-                    raise ValidationError('You have not met a constraint!')
+            #     else:
+            #         print 'NAO TEM PERMISSAO DE SALVAR EM OUTRO SITE'
+            #         raise ValidationError('You have not met a constraint!')
             except Exception, e:
-                # raise
-                obj.autor = request.user
-                obj.site = request.user.profile.site
-                obj.save()
-                print 'NAO TEM OBJ, CRIADO NOVO'
-            # else:
-            #     pass
-            # finally:
-            #     pass
+            #     # raise
+                if request.user.profile:
+                    obj.autor = request.user
+                    obj.site = request.user.profile.site
+                    obj.save()
+            #     print 'NAO TEM OBJ, CRIADO NOVO'
+            # # else:
+            # #     pass
+            # # finally:
+            # #     pass
 
     class Media:
         js = [
